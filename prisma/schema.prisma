@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Simulation {
+  id String @id @default(uuid())
+  productName String
+  prime Decimal
+  quoteReference String @unique
+  endDate DateTime
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id String @id @default(uuid())
+  vehiculeCategory String
+  immatricalation String
+  userData Json
+  status String
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  password String
+  role String
+}
