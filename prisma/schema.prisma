@@ -7,27 +7,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Simulation {
-  id String @id @default(uuid())
-  productName String
-  prime Decimal
-  quoteReference String @unique
-  endDate DateTime
-  createdAt DateTime @default(now())
-}
-
-model Subscription {
-  id String @id @default(uuid())
-  vehiculeCategory String
-  immatricalation String
-  userData Json
-  status String
-  createdAt DateTime @default(now())
+enum Role {
+  ADMIN
+  AMAZONE
 }
 
 model User {
-  id String @id @default(uuid())
-  email String @unique
-  password String
-  role String
+  id        String     @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(AMAZONE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  simulations Simulation[]
+  subscriptions Subscription[]
+}
+
+model Vehicle {
+  id               String       @id @default(uuid())
+  registration     String    @unique
+  circulationDate  DateTime
+  color            String
+  seats            Int
+  doors            Int
+  categoryCode     String
+  power            Int?
+  valueNew         Float?
+  valueVenal       Float?
+  simulations      Simulation[]
+  subscriptions    Subscription[]
+}
+
+model Product {
+  code        String   @id
+  name        String
+  categories  String[]
+  guarantees  String[]
+  simulations Simulation[]
+}
+
+model Simulation {
+  id            String @id @default(uuid())
+  reference     String    @unique
+  productCode   String
+  vehicleId     String
+  userId        String
+  price         Float
+  endDate       DateTime
+  createdAt     DateTime  @default(now())
+  subscription Subscription?
+
+  product       Product   @relation(fields: [productCode], references: [code])
+  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id            String       @id @default(uuid())
+  simulationId  String       @unique
+  status        String    @default("PENDING")
+  attestationId String?
+  createdAt     DateTime  @default(now())
+  userId        String
+  vehicleId     String
+
+  user          User      @relation(fields: [userId], references: [id])
+  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id])
+  simulation    Simulation @relation(fields: [simulationId], references: [id])
 }
