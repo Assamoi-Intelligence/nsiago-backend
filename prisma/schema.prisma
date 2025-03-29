@@ -34,9 +34,7 @@ model Vehicle {
   power            Int?
   valueNew         Float?
   valueVenal       Float?
-  simulations      Simulation[]
   subscriptions    Subscription[]
-
   category        Category @relation(fields: [categoryCode], references: [code])
 }
 
@@ -59,17 +57,18 @@ model Product {
 
 model Simulation {
   id            String @id @default(uuid())
-  reference     String    @unique
+  quoteReference     String    @unique
   productCode   String
-  vehicleId     String
   userId        String
+  power         Int?
+  valueNew      Float
+  valueVenal    Float
   price         Float
   endDate       DateTime
   createdAt     DateTime  @default(now())
   subscription Subscription?
 
   product       Product   @relation(fields: [productCode], references: [code])
-  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id])
   user          User      @relation(fields: [userId], references: [id])
 }
 

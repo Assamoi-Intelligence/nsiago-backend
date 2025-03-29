@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Vehicle } from '@prisma/client';
 
+interface PrimeParams {
+    valueNew: number,
+    valueVenal: number,
+    power: number,
+    garantees: string[],
+}
+
 @Injectable()
 export class CalculationsService {
 
@@ -13,22 +20,56 @@ export class CalculationsService {
         { max: Infinity, value: 104143 }
     ];
 
-    // calculateRC(power: number): number {
-    //     return this.rates.find(r => power <= r.max).value;
-    // }
+    private calculateRC(power: number) {
+        return this.rates.find(r => power <= r.max)?.value ?? 0;
+    }
 
-    // calculateGarantie(garantie: string, vehicle: Vehicle): number {
-    //     switch(garantie) {
-    //     case 'DOMMAGE':
-    //         return vehicle.valueNew * 0.026;
-    //     case 'TIERCE_COLLISION':
-    //         return vehicle.valueNew * 0.0165;
-    //     case 'TIERCE_PLAFONNEE':
-    //         return Math.max(vehicle.valueVenal * 0.042, 100000);
-    //     case 'INCENDIE':
-    //         return vehicle.valueVenal * 0.0015;
-    //     default:
-    //         throw new Error('Garantie non reconnue');
-    //     }
-    // }
+    private calculateVehicleAge(circulationDate: Date): number {
+        const today = new Date();
+        return today.getFullYear() - circulationDate.getFullYear();
+    }
+
+    validateGuarantees(circulationDate: Date, garanties: string[]) {
+        const vehicleAge = this.calculateVehicleAge(circulationDate);
+        garanties.forEach(garantie => {
+          switch(garantie) {
+            case 'DOMMAGE':
+              if(vehicleAge > 5) throw new Error('Garantie DOMMAGE non disponible pour véhicules >5 ans');
+              break;
+            case 'TIERCE_COLLISION':
+              if(vehicleAge > 8) throw new Error('Garantie TIERCE_COLLISION non disponible pour véhicules >8 ans');
+              break;
+            case 'TIERCE_PLAFONNEE':
+              if(vehicleAge > 10) throw new Error('Garantie TIERCE_PLAFONNEE non disponible pour véhicules >10 ans');
+              break;
+          }
+        });
+    }
+
+    getPrime(primeParams: PrimeParams) {
+        const {power, garantees, valueNew, valueVenal} = primeParams;
+        let prime = this.calculateRC(power);
+        for(const garantie of garantees) {
+            switch(garantie) {
+                case 'DOMMAGE':
+                    prime += valueNew * 0.026;
+                    break;
+                case 'TIERCE_COLLISION':
+                    prime += valueNew * 0.0165;
+                    break;
+                case 'TIERCE_PLAFONNEE':
+                    prime += valueVenal * 0.042;
+                    if(prime < 100000) prime = 100000; // Prime minimum
+                    break;
+                case 'VOL':
+                    prime += valueVenal * 0.0014;
+                    break;
+                case 'INCENDIE':
+                    prime += valueVenal * 0.0015;
+                    break;
+            }
+        }
+        return prime;
+    }
+
 }
