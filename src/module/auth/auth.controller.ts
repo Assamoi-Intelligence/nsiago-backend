@@ -16,7 +16,7 @@ export class AuthController {
         if (!user) throw new UnauthorizedException('Identifiants incorrectes');
         return this.authService.signIn(user);
     }
-
+    
     @HttpCode(HttpStatus.OK)
     @Post('signup')
     async signup(@Body() signUpDto: SignUpDto) {

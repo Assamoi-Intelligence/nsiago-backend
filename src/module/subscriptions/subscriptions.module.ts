@@ -5,10 +5,11 @@ import { SimulationsService } from '../simulations/simulations.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { CalculationsService } from 'src/shared/calculation.service';
 import { ProductsService } from '../products/products.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [PrismaModule],
   controllers: [SubscriptionsController],
-  providers: [SubscriptionsService],
+  providers: [SubscriptionsService, JwtService],
 })
 export class SubscriptionsModule {}
