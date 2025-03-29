@@ -37,7 +37,7 @@ export class SimulationsService {
       quoteReference: `QT-${Math.random().toString(36).slice(2, 14)}`,
       valueVenal, valueNew, price,
       endDate: new Date(Date.now() + 12096e5),
-      userId, productCode
+      userId, productCode, circulationDate
     }});
   }
 
@@ -47,6 +47,10 @@ export class SimulationsService {
 
   findOne(quoteReference: string) {
     return this.prisma.simulation.findUnique({where: {quoteReference}});
+  }
+
+  findOneById(id: string) {
+    return this.prisma.simulation.findUnique({where: {id}});
   }
 
   update(id: number, updateSimulationDto: UpdateSimulationDto) {

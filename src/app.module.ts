@@ -8,7 +8,6 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './module/auth/auth.module';
 import { UsersModule } from './module/users/users.module';
 import { ProductsModule } from './module/products/products.module';
-import { VehiclesModule } from './module/vehicles/vehicles.module';
 import { CategoriesModule } from './module/categories/categories.module';
 
 @Module({
@@ -18,7 +17,7 @@ import { CategoriesModule } from './module/categories/categories.module';
     PrismaModule, 
     ConfigModule.forRoot({isGlobal: true}), 
     AuthModule, 
-    UsersModule, ProductsModule, VehiclesModule, CategoriesModule
+    UsersModule, ProductsModule, CategoriesModule
   ],
   controllers: [AppController],
   providers: [AppService],

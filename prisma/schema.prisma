@@ -23,27 +23,12 @@ model User {
   subscriptions Subscription[]
 }
 
-model Vehicle {
-  id               String       @id @default(uuid())
-  registration     String    @unique
-  circulationDate  DateTime
-  color            String
-  seats            Int
-  doors            Int
-  categoryCode     String
-  power            Int?
-  valueNew         Float?
-  valueVenal       Float?
-  subscriptions    Subscription[]
-  category        Category @relation(fields: [categoryCode], references: [code])
-}
-
 model Category {
   id          String @id @default(uuid())
   code        String @unique
   label       String
   description String
-  vehicles     Vehicle[]
+  subcription    Subscription[]
 }
 
 model Product {
@@ -64,6 +49,7 @@ model Simulation {
   valueNew      Float
   valueVenal    Float
   price         Float
+  circulationDate DateTime
   endDate       DateTime
   createdAt     DateTime  @default(now())
   subscription Subscription?
@@ -73,15 +59,34 @@ model Simulation {
 }
 
 model Subscription {
-  id            String       @id @default(uuid())
-  simulationId  String       @unique
-  status        String    @default("PENDING")
+  id            String     @id @default(uuid())
+  simulationId  String     @unique
+  status        SubscriptionStatus    @default(PENDING)
   attestationId String?
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime   @default(now())
   userId        String
-  vehicleId     String
 
-  user          User      @relation(fields: [userId], references: [id])
-  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id])
-  simulation    Simulation @relation(fields: [simulationId], references: [id])
+  firstName     String
+  lastName      String
+  ciNumber      String     @unique
+  phone         String
+  address       String
+  city          String
+
+  immatriculation     String    @unique
+  circulationDate     DateTime
+  color               String
+  seats               Int
+  doors               Int
+  vehicleCategoryCode        String
+
+  category            Category @relation(fields: [vehicleCategoryCode], references: [code])
+  user                User       @relation(fields: [userId], references: [id])
+  simulation          Simulation @relation(fields: [simulationId], references: [id])  
+}
+
+enum SubscriptionStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
 }

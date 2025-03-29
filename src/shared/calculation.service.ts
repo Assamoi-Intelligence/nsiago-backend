@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Vehicle } from '@prisma/client';
 
 interface PrimeParams {
     valueNew: number,
