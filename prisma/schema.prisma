@@ -36,15 +36,26 @@ model Vehicle {
   valueVenal       Float?
   simulations      Simulation[]
   subscriptions    Subscription[]
+
+  category        Category @relation(fields: [categoryCode], references: [code])
+}
+
+model Category {
+  id          String @id @default(uuid())
+  code        String @unique
+  label       String
+  description String
+  vehicles     Vehicle[]
 }
 
 model Product {
-  code        String   @id
+  code        String   @id @default(uuid())
   name        String
   categories  String[]
   guarantees  String[]
   simulations Simulation[]
 }
+
 
 model Simulation {
   id            String @id @default(uuid())
