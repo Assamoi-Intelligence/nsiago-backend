@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ConflictException, NotFoundException } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -8,7 +8,9 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
+  async create(@Body() createCategoryDto: CreateCategoryDto) {
+    const category = await this.categoriesService.findOne(createCategoryDto.code);
+    if (category) throw new ConflictException('Cette catégorie existe déjà');
     return this.categoriesService.create(createCategoryDto);
   }
 
@@ -17,18 +19,24 @@ export class CategoriesController {
     return this.categoriesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoriesService.findOne(+id);
+  @Get(':code')
+  async findOne(@Param('code') code: string) {
+    const category = await this.categoriesService.findOne(code);
+    if (!category) throw new NotFoundException(`La catégorie avec le code ${code} est introuvable`);
+    return this.categoriesService.findOne(code);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoriesService.update(+id, updateCategoryDto);
+  async update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+    const category = await this.categoriesService.findOneId(id);
+    if (!category) throw new NotFoundException(`Cette catégorie est introuvable`);
+    return this.categoriesService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoriesService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const category = await this.categoriesService.findOneId(id);
+    if (!category) throw new NotFoundException(`Cette catégorie est introuvable`);
+    return this.categoriesService.remove(id);
   }
 }
